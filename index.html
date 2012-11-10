@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Nativity</title>
+        
+        <link rel="stylesheet" href="assets/style.css">
+        <script src="/lib/modernizr.js"></script>
+    </head>
+
+    <body>
+        <section class="container">
+          <div id="cube">
+            <div id="star"></div>
+            <div id="message" class="loading">
+                <span> </span>
+                <span>M</span>
+                <span>e</span>
+                <span>r</span>
+                <span>r</span>
+                <span>y</span>
+                <span> </span>
+                <span>C</span>
+                <span>h</span>
+                <span>r</span>
+                <span>i</span>
+                <span>s</span>
+                <span>t</span>
+                <span>m</span>
+                <span>a</span>
+                <span>s</span>
+                <span> </span>
+            </div>
+            <div id="stable"></div>
+            <div id="shepherds"></div>
+            <div id="shepherds-text" class="passage">You will find a baby wrapped in cloths and lying in a manger</div>
+            <div id="wise-men"></div>
+            <div id="wise-men-text" class="passage">&hellip;wise men from the East came to Jerusalem&hellip;</div>
+            <div id="floor"></div>
+          </div>
+        </section>
+    
+        <script src="lib/jquery.min.js"></script>
+        <script>
+        var ROTATION_MAGNITUDE = 5;
+        
+        $(function () {
+            if (!(Modernizr.csstransforms && Modernizr.csstransforms3d && Modernizr.csstransitions)) {
+                alert('Your browser does not have the necessary support for this card.\nAs a result things might look a bit funky!\nMerry Christmas and a Happy New Year');
+            }
+            
+            var $window = $(window);
+            var cube = $('#cube')[0];
+            var mouse_x = Math.round($window.width() / 2);
+            var mouse_y = Math.round($window.height() / 2);
+            var current_rotation_x = 0;
+            var current_rotation_y = 0;
+            
+            var update_rotation = function () {
+                var window_half_width = $window.width() / 2;
+                var window_half_height = $window.height() / 2;
+                var distance_from_center_x = mouse_x - window_half_width;
+                var distance_from_center_y = mouse_y - window_half_height;
+                
+                var fractional_displacement_x = Math.round(
+                    ROTATION_MAGNITUDE * distance_from_center_x / window_half_width
+                );
+                var fractional_displacement_y = Math.round(
+                    ROTATION_MAGNITUDE * distance_from_center_y / window_half_height
+                    );
+                
+                current_rotation_x += fractional_displacement_x;
+                current_rotation_y += fractional_displacement_y;
+                cube.style[Modernizr.prefixed('transform')] = "translateZ(-400px) rotateY("+current_rotation_x+"deg) rotateX("+current_rotation_y+"deg)";
+            };
+            
+            $(document).on('mousemove', function (evt) {
+                mouse_x = evt.pageX;
+                mouse_y = evt.pageY;
+            });
+            
+            setInterval(update_rotation, 100);
+            update_rotation();
+            position_message();
+        });
+        
+        var position_message = function () {
+            var $message = $('#message');
+            var $message_letters = $message.children('span');
+            var message_letter_count = $message_letters.length;
+            var radius = 300;
+            
+            $message_letters.each(function (index, letter) {
+                var y_rotation_angle = 2 * Math.PI * index / message_letter_count;
+                var x_displacement = radius * Math.sin(y_rotation_angle);
+                var z_displacement = radius * Math.cos(y_rotation_angle);
+
+                letter.style[Modernizr.prefixed('transform')] = 'translateX('+x_displacement+'px) translateZ('+z_displacement+'px) rotateY('+y_rotation_angle+'rad)';
+            });
+            $message.removeClass('loading');
+        };
+        
+        </script>
+    </body>
+</html>
